@@ -1,14 +1,8 @@
-import { supabaseClient } from '@/lib/supabase';
-import { Session } from '@supabase/supabase-js';
-import React, { useEffect, useState } from 'react';
+import { useAuth } from '@/ctx/AuthContext';
+import React from 'react';
 import { Text } from 'react-native';
 
-export default function profile() {
-  const [session, setSession] = useState<Session | null>(null);
-  useEffect(() => {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-  }, []);
+export default function ProfileScreen() {
+  const { session } = useAuth();
   return <>{session && session.user && <Text>{session.user.id}</Text>}</>;
 }
