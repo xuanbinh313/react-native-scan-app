@@ -28,7 +28,7 @@ export default function ProductsScreen() {
         renderItem={({ item }) => (
           <View className='border-x-fuchsia-50 p-2'>
             {item.thumbnail && <Image source={{ uri: item.thumbnail }} className='h-24 w-24' resizeMode='contain' />}
-            <Text>{item.title}</Text>
+            <Text className='text-lg font-bold'>{item.title}</Text>
             <Text>{item.description}</Text>
           </View>
         )}
