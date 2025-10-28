@@ -7,11 +7,10 @@ export default function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading) {
-      if (session)
-        router.replace('/'); // đã đăng nhập → về trang Home
-      else router.replace('/login'); // chưa đăng nhập → về Login
+    console.log('Auth loading finished, session:', loading, session);
+    if (!loading && !session) {
+      router.replace('/login'); // chưa đăng nhập → về Login
     }
-  }, [loading, session]);
+  }, [loading, session?.access_token]);
   return <Slot />;
 }

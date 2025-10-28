@@ -1,6 +1,8 @@
+import { useAuth } from '@/ctx/AuthContext';
 import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
 
 export default function TabLayout() {
+  const { session } = useAuth();
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">
@@ -11,6 +13,12 @@ export default function TabLayout() {
         <Icon sf="gear" drawable="custom_settings_drawable" />
         <Label>Products</Label>
       </NativeTabs.Trigger>
+      {session && (
+        <NativeTabs.Trigger name="profile">
+          <Icon sf="person.circle" drawable="custom_profile_drawable" />
+          <Label>Profile</Label>
+        </NativeTabs.Trigger>
+      )}
     </NativeTabs>
   );
 }
