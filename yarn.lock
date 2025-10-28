@@ -5355,6 +5355,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-clipboard@npm:~8.0.7":
+  version: 8.0.7
+  resolution: "expo-clipboard@npm:8.0.7"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/a78a4a281d1da9c117d71001ed5987f0ac6ef856afdc89b8f1cd16088132a00e2924d9c4e71f3a7d14c33c96be21a70ae324a73210a3727cf2b1a6e0644b60c9
+  languageName: node
+  linkType: hard
+
 "expo-constants@npm:~18.0.10, expo-constants@npm:~18.0.8, expo-constants@npm:~18.0.9":
   version: 18.0.10
   resolution: "expo-constants@npm:18.0.10"
@@ -5388,6 +5399,26 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/7336a6094705c46379d4bb93f34a3b6c8d5fca871b34d62db94739b204639f3eeb6b1f5db4b4209e28a34348360075ccf557fe28ca996182469685427e570a9d
+  languageName: node
+  linkType: hard
+
+"expo-image-loader@npm:~6.0.0":
+  version: 6.0.0
+  resolution: "expo-image-loader@npm:6.0.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/36f1e80d2b3d2a1cce440c7d938cd3cf3138f2b1fa706a1954e415bfae87b5b8eeaec65be0ab17880eb7585dd28c9225d056ebdb98ac81e0ffbfe880d952b0eb
+  languageName: node
+  linkType: hard
+
+"expo-image-picker@npm:~17.0.8":
+  version: 17.0.8
+  resolution: "expo-image-picker@npm:17.0.8"
+  dependencies:
+    expo-image-loader: "npm:~6.0.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/9ae865851707338b656d9f7022999e97ef8a7a4e9988dee0c85b6c4f1079afdf8e80f831a5612f6e42aa203a623bdb72bb25e32d4d6bb7c26092192f7c39af93
   languageName: node
   linkType: hard
 
@@ -6939,7 +6970,9 @@ __metadata:
     eslint-config-expo: "npm:~10.0.0"
     eslint-config-prettier: "npm:^10.1.2"
     expo: "npm:^54.0.0"
+    expo-clipboard: "npm:~8.0.7"
     expo-constants: "npm:~18.0.10"
+    expo-image-picker: "npm:~17.0.8"
     expo-linking: "npm:~8.0.8"
     expo-router: "npm:~6.0.13"
     expo-status-bar: "npm:~3.0.8"
@@ -6950,6 +6983,7 @@ __metadata:
     react-dom: "npm:19.1.0"
     react-hook-form: "npm:^7.65.0"
     react-native: "npm:0.81.4"
+    react-native-compressor: "npm:^1.13.0"
     react-native-reanimated: "npm:~4.1.1"
     react-native-safe-area-context: "npm:^5.6.1"
     react-native-screens: "npm:~4.16.0"
@@ -8986,6 +9020,16 @@ __metadata:
   version: 19.2.0
   resolution: "react-is@npm:19.2.0"
   checksum: 10c0/a63cb346aeced8ac0e671b0f9b33720d2906de02a066ca067075d871a5d4c64cdb328f495baf9b5842d5868c0d5edd1ce18465a7358b52f4b6aa983479c9bfa2
+  languageName: node
+  linkType: hard
+
+"react-native-compressor@npm:^1.13.0":
+  version: 1.13.0
+  resolution: "react-native-compressor@npm:1.13.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/dc9b5b411b0626137b06f2901e3aacb05fc5269509ebcfcacf2de884b501f343531431bde92c3156968e506ffed75561285eb68b80a0a17de56465a04a4bb314
   languageName: node
   linkType: hard
 

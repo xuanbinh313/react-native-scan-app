@@ -1,376 +1,1392 @@
-create table public.product (
-    id text primary key,
-    title text not null,
-    handle text not null,
-    description text not null,
-    status text default 'draft',
-    thumbnail text,
-    weight text,
-    is_giftcard boolean not null,
-    discountable boolean not null,
-    created_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    constraint product_status_check check (
-        status in (
-            'draft',
-            'proposed',
-            'published',
-            'rejected'
-        )
-    )
-)
-
-create table public.product_category (
-    id text primary key,
+create table if not exists public.currency(
+    code text not null,
+    symbol text not null,
+    symbol_native text not null,
+    decimal_digits int not null default 0,
+    rounding numeric not null,
+    raw_rounding jsonb not null,
     name text not null,
-    hanlde text not null,
-    mpath text not null,
-    description text not null,
-    is_active boolean not null,
-    Hey,
-    Cortana.URIA.The Rock said.Alternatively,
-    Cortana.Hey,
-    Cortana.is_internal boolean not null,
-    rank int4 not null default 0,
-    parent_id text references public.product_category (id),
-    created_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    deleted_at timestamp with time zone
-)
-create table public.product_option (
-    id text primary key,
-    title text not null,
-    created_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    deleted_at timestamp with time zone,
-    product_id text references public.product (id) not null
-)
-
-create table public.product_option_value (
-    id text primary key,
-    value text not null,
-    created_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    deleted_at timestamp with time zone,
-    option_id text references public.product_option (id)
-)
-create table public.product_variant (
-    id text primary key,
-    title text not null,
-    sku text,
-    created_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    updated_at timestamp with time zone default timezone ('utc'::text, now()) not null,
-    deleted_at timestamp with time zone,
-    product_id text references public.product (id)
-)
-
-create table public.product_category_product (
-    product_id text not null references public.product (id) on delete cascade,
-    product_category_id text not null references public.product_category (id) on delete cascade
-)
-create table if not exists public.image (
-    id text not null,
-    url text not null,
-    rank int not null default 0,
-    metadata jsonb null,
-    product_id text not null references public.product (id) on delete cascade,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now(),
     deleted_at timestamptz null,
-    constraint "image_pkey" primary key ("id")
-);
+    constraint "currency_pkey" primary key ("code")
+)
 
 insert into
-    public.product (
-        "id",
-        "title",
-        "handle",
-        "description",
-        "status",
-        "thumbnail",
-        "weight",
-        "is_giftcard",
-        "discountable"
-    )
-values (
-        'prod_01K8HTJTFX0EE5891M0N192E4Y',
-        'Medusa T-Shirt',
-        't-shirt',
-        'Reimagine the feeling of a classic T-shirt. With our cotton T-shirts, everyday essentials no longer have to be ordinary.',
-        'published',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-front.png',
-        '400',
-        false,
-        true
-    ),
-    (
-        'prod_01K8HTJTFXBMJ3S49WAKQQ54TX',
-        'Medusa Sweatshirt',
-        'sweatshirt',
-        'Reimagine the feeling of a classic sweatshirt. With our cotton sweatshirt, everyday essentials no longer have to be ordinary.',
-        'published',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-front.png',
-        '400',
-        false,
-        true
-    ),
-    (
-        'prod_01K8HTJTFXE1Y118PYQ8S9C0XB',
-        'Medusa Sweatpants',
-        'sweatpants',
-        'Reimagine the feeling of classic sweatpants. With our cotton sweatpants, everyday essentials no longer have to be ordinary.',
-        'published',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-front.png',
-        '400',
-        false,
-        true
-    ),
-    (
-        'prod_01K8HTJTFXHT9HY2XGDV8X4WN1',
-        'Medusa Shorts',
-        'shorts',
-        'Reimagine the feeling of classic shorts. With our cotton shorts, everyday essentials no longer have to be ordinary.',
-        'published',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-front.png',
-        '400',
-        false,
-        true
-    )
-
-insert into
-    public.product_category (
-        "id",
+    public.currency (
+        "code",
+        "symbol",
+        "symbol_native",
         "name",
-        "handle",
-        "mpath",
-        "is_active",
-        "rank",
-        "description",
-        "is_internal"
+        "decimal_digits",
+        "rounding",
+        "raw_rounding",
+        "created_at",
+        "updated_at"
     )
 values (
-        'pcat_01K8HTJTEZWPAHTJ804VD6C16V',
-        'Shirts',
-        'shirts',
-        'pcat_01K8HTJTEZWPAHTJ804VD6C16V',
-        true,
-        0,
-        '',
-        false
-    ),
-    (
-        'pcat_01K8HTJTF0Y06MRD0D8A1BMJT8',
-        'Sweatshirts',
-        'sweatshirts',
-        'pcat_01K8HTJTF0Y06MRD0D8A1BMJT8',
-        true,
-        1,
-        '',
-        false
-    ),
-    (
-        'pcat_01K8HTJTF126HPZ76Y915YAN06',
-        'Pants',
-        'pants',
-        'pcat_01K8HTJTF126HPZ76Y915YAN06',
-        true,
+        'usd',
+        '$',
+        '$',
+        'US Dollar',
         2,
-        '',
-        false
-    ),
-    (
-        'pcat_01K8HTJTF3YBGK6C12BXJK0HWP',
-        'Merch',
-        'merch',
-        'pcat_01K8HTJTF3YBGK6C12BXJK0HWP',
-        true,
-        3,
-        '',
-        false
-    )
-insert into
-    public.product_option ("id", "title", "product_id")
-values (
-        'opt_01K8HTJTG0S3WS2QXDMBK5A4WQ',
-        'Size',
-        'prod_01K8HTJTFX0EE5891M0N192E4Y'
-    ),
-    (
-        'opt_01K8HTJTG058K9ZEH44JPRN1WC',
-        'Color',
-        'prod_01K8HTJTFX0EE5891M0N192E4Y'
-    ),
-    (
-        'opt_01K8HTJTG2AFZ3TR4PDNXB1B44',
-        'Size',
-        'prod_01K8HTJTFXBMJ3S49WAKQQ54TX'
-    ),
-    (
-        'opt_01K8HTJTG3NCR4HCJA6Z5V7APN',
-        'Size',
-        'prod_01K8HTJTFXE1Y118PYQ8S9C0XB'
-    ),
-    (
-        'opt_01K8HTJTG43T61ZBRXVY5CGH8V',
-        'Size',
-        'prod_01K8HTJTFXHT9HY2XGDV8X4WN1'
-    )
-insert into
-    public.product_option_value ("id", "value", "option_id")
-values (
-        'optval_01K8HTJTFZ594HWQ2VAZP54DAE',
-        'S',
-        'opt_01K8HTJTG0S3WS2QXDMBK5A4WQ'
-    ),
-    (
-        'optval_01K8HTJTFZVM6KSV70SPEJAEEE',
-        'M',
-        'opt_01K8HTJTG0S3WS2QXDMBK5A4WQ'
-    ),
-    (
-        'optval_01K8HTJTFZQX1HE68NWT7CD9CD',
-        'L',
-        'opt_01K8HTJTG0S3WS2QXDMBK5A4WQ'
-    ),
-    (
-        'optval_01K8HTJTFZMJSHZ3ARQ03SKBHA',
-        'XL',
-        'opt_01K8HTJTG0S3WS2QXDMBK5A4WQ'
-    ),
-    (
-        'optval_01K8HTJTG0CW8T82VZ2AJ7744M',
-        'Black',
-        'opt_01K8HTJTG058K9ZEH44JPRN1WC'
-    ),
-    (
-        'optval_01K8HTJTG0GF023H6FQTCD0SCX',
-        'White',
-        'opt_01K8HTJTG058K9ZEH44JPRN1WC'
-    ),
-    (
-        'optval_01K8HTJTG1ZX0ZG9Q395DB56CD',
-        'S',
-        'opt_01K8HTJTG2AFZ3TR4PDNXB1B44'
-    ),
-    (
-        'optval_01K8HTJTG15XFT6P2T729M8C6A',
-        'M',
-        'opt_01K8HTJTG2AFZ3TR4PDNXB1B44'
-    ),
-    (
-        'optval_01K8HTJTG2NPV7Y1GSVR9VKKAQ',
-        'L',
-        'opt_01K8HTJTG2AFZ3TR4PDNXB1B44'
-    ),
-    (
-        'optval_01K8HTJTG25ZMNDRGVSWWC4PQ4',
-        'XL',
-        'opt_01K8HTJTG2AFZ3TR4PDNXB1B44'
-    ),
-    (
-        'optval_01K8HTJTG2FRKDKCEMGX8RAHVH',
-        'S',
-        'opt_01K8HTJTG3NCR4HCJA6Z5V7APN'
-    ),
-    (
-        'optval_01K8HTJTG223EESA6A3CREWAHX',
-        'M',
-        'opt_01K8HTJTG3NCR4HCJA6Z5V7APN'
-    ),
-    (
-        'optval_01K8HTJTG3KM0Q0AF2FGGP3WCF',
-        'L',
-        'opt_01K8HTJTG3NCR4HCJA6Z5V7APN'
-    ),
-    (
-        'optval_01K8HTJTG3B7H4RM3A1A5B1ZY8',
-        'XL',
-        'opt_01K8HTJTG3NCR4HCJA6Z5V7APN'
-    ),
-    (
-        'optval_01K8HTJTG32FQ6153V45RCAMZD',
-        'S',
-        'opt_01K8HTJTG43T61ZBRXVY5CGH8V'
-    ),
-    (
-        'optval_01K8HTJTG3A6QX3HNEWYMRR7B2',
-        'M',
-        'opt_01K8HTJTG43T61ZBRXVY5CGH8V'
-    ),
-    (
-        'optval_01K8HTJTG3ASW5M8YJWFCSX135',
-        'L',
-        'opt_01K8HTJTG43T61ZBRXVY5CGH8V'
-    ),
-    (
-        'optval_01K8HTJTG3VFY6JW51Q6848YGY',
-        'XL',
-        'opt_01K8HTJTG43T61ZBRXVY5CGH8V'
-    )
-insert into
-    public.image (
-        "id",
-        "url",
-        "rank",
-        "product_id"
-    )
-values (
-        'img_01K8HTJTG0HBTZ4DP0ZPM3R25V',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-front.png',
         0,
-        'prod_01K8HTJTFX0EE5891M0N192E4Y'
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.951Z',
+        '2025-10-27T03:14:16.951Z'
     ),
     (
-        'img_01K8HTJTG0223CCQN11J9E3ZW2',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-back.png',
-        1,
-        'prod_01K8HTJTFX0EE5891M0N192E4Y'
-    ),
-    (
-        'img_01K8HTJTG1VCM4TBMJVF7PHM88',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-white-front.png',
+        'cad',
+        'CA$',
+        '$',
+        'Canadian Dollar',
         2,
-        'prod_01K8HTJTFX0EE5891M0N192E4Y'
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
     ),
     (
-        'img_01K8HTJTG1KQ4M6BMKHQPTW3BE',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-white-back.png',
+        'eur',
+        '€',
+        '€',
+        'Euro',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'aed',
+        'AED',
+        'د.إ.‏',
+        'United Arab Emirates Dirham',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'afn',
+        'Af',
+        '؋',
+        'Afghan Afghani',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'all',
+        'ALL',
+        'Lek',
+        'Albanian Lek',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'amd',
+        'AMD',
+        'դր.',
+        'Armenian Dram',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'ars',
+        'AR$',
+        '$',
+        'Argentine Peso',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'aud',
+        'AU$',
+        '$',
+        'Australian Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'azn',
+        'man.',
+        'ман.',
+        'Azerbaijani Manat',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'bam',
+        'KM',
+        'KM',
+        'Bosnia-Herzegovina Convertible Mark',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'bdt',
+        'Tk',
+        '৳',
+        'Bangladeshi Taka',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'bgn',
+        'BGN',
+        'лв.',
+        'Bulgarian Lev',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.952Z',
+        '2025-10-27T03:14:16.952Z'
+    ),
+    (
+        'bhd',
+        'BD',
+        'د.ب.‏',
+        'Bahraini Dinar',
         3,
-        'prod_01K8HTJTFX0EE5891M0N192E4Y'
-    ),
-    (
-        'img_01K8HTJTG2XG6ERYG97AJEEJ34',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-front.png',
         0,
-        'prod_01K8HTJTFXBMJ3S49WAKQQ54TX'
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
     ),
     (
-        'img_01K8HTJTG2B13JPACSR21ER6B8',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatshirt-vintage-back.png',
-        1,
-        'prod_01K8HTJTFXBMJ3S49WAKQQ54TX'
-    ),
-    (
-        'img_01K8HTJTG3YNHB1W070Z1Q9B8B',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-front.png',
+        'bif',
+        'FBu',
+        'FBu',
+        'Burundian Franc',
         0,
-        'prod_01K8HTJTFXE1Y118PYQ8S9C0XB'
-    ),
-    (
-        'img_01K8HTJTG3B3Y6GH0RBXB9XJP6',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/sweatpants-gray-back.png',
-        1,
-        'prod_01K8HTJTFXE1Y118PYQ8S9C0XB'
-    ),
-    (
-        'img_01K8HTJTG46362J8MBPC59JV8R',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-front.png',
         0,
-        'prod_01K8HTJTFXHT9HY2XGDV8X4WN1'
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
     ),
     (
-        'img_01K8HTJTG40FJC93ZVD0NJ6ECK',
-        'https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-back.png',
-        1,
-        'prod_01K8HTJTFXHT9HY2XGDV8X4WN1'
+        'bnd',
+        'BN$',
+        '$',
+        'Brunei Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'bob',
+        'Bs',
+        'Bs',
+        'Bolivian Boliviano',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'brl',
+        'R$',
+        'R$',
+        'Brazilian Real',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'bwp',
+        'BWP',
+        'P',
+        'Botswanan Pula',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'byn',
+        'Br',
+        'руб.',
+        'Belarusian Ruble',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'bzd',
+        'BZ$',
+        '$',
+        'Belize Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'cdf',
+        'CDF',
+        'FrCD',
+        'Congolese Franc',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'chf',
+        'CHF',
+        'CHF',
+        'Swiss Franc',
+        2,
+        0.05,
+        '{"value":"0.05","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'clp',
+        'CL$',
+        '$',
+        'Chilean Peso',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'cny',
+        'CN¥',
+        'CN¥',
+        'Chinese Yuan',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'cop',
+        'CO$',
+        '$',
+        'Colombian Peso',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'crc',
+        '₡',
+        '₡',
+        'Costa Rican Colón',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'cve',
+        'CV$',
+        'CV$',
+        'Cape Verdean Escudo',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'czk',
+        'Kč',
+        'Kč',
+        'Czech Republic Koruna',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'djf',
+        'Fdj',
+        'Fdj',
+        'Djiboutian Franc',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'dkk',
+        'Dkr',
+        'kr',
+        'Danish Krone',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'dop',
+        'RD$',
+        'RD$',
+        'Dominican Peso',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'dzd',
+        'DA',
+        'د.ج.‏',
+        'Algerian Dinar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'eek',
+        'Ekr',
+        'kr',
+        'Estonian Kroon',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'egp',
+        'EGP',
+        'ج.م.‏',
+        'Egyptian Pound',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'ern',
+        'Nfk',
+        'Nfk',
+        'Eritrean Nakfa',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'etb',
+        'Br',
+        'Br',
+        'Ethiopian Birr',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'gbp',
+        '£',
+        '£',
+        'British Pound Sterling',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'gel',
+        'GEL',
+        'GEL',
+        'Georgian Lari',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'ghs',
+        'GH₵',
+        'GH₵',
+        'Ghanaian Cedi',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'gnf',
+        'FG',
+        'FG',
+        'Guinean Franc',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'gtq',
+        'GTQ',
+        'Q',
+        'Guatemalan Quetzal',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'hkd',
+        'HK$',
+        '$',
+        'Hong Kong Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.953Z',
+        '2025-10-27T03:14:16.953Z'
+    ),
+    (
+        'hnl',
+        'HNL',
+        'L',
+        'Honduran Lempira',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'hrk',
+        'kn',
+        'kn',
+        'Croatian Kuna',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'huf',
+        'Ft',
+        'Ft',
+        'Hungarian Forint',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'idr',
+        'Rp',
+        'Rp',
+        'Indonesian Rupiah',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'ils',
+        '₪',
+        '₪',
+        'Israeli New Sheqel',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'inr',
+        'Rs',
+        '₹',
+        'Indian Rupee',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'iqd',
+        'IQD',
+        'د.ع.‏',
+        'Iraqi Dinar',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'irr',
+        'IRR',
+        '﷼',
+        'Iranian Rial',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'isk',
+        'Ikr',
+        'kr',
+        'Icelandic Króna',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'jmd',
+        'J$',
+        '$',
+        'Jamaican Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'jod',
+        'JD',
+        'د.أ.‏',
+        'Jordanian Dinar',
+        3,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'jpy',
+        '¥',
+        '￥',
+        'Japanese Yen',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'kes',
+        'Ksh',
+        'Ksh',
+        'Kenyan Shilling',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'khr',
+        'KHR',
+        '៛',
+        'Cambodian Riel',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'kmf',
+        'CF',
+        'FC',
+        'Comorian Franc',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'krw',
+        '₩',
+        '₩',
+        'South Korean Won',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'kwd',
+        'KD',
+        'د.ك.‏',
+        'Kuwaiti Dinar',
+        3,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'kzt',
+        'KZT',
+        'тңг.',
+        'Kazakhstani Tenge',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'lbp',
+        'LB£',
+        'ل.ل.‏',
+        'Lebanese Pound',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'lkr',
+        'SLRs',
+        'SL Re',
+        'Sri Lankan Rupee',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'ltl',
+        'Lt',
+        'Lt',
+        'Lithuanian Litas',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'lvl',
+        'Ls',
+        'Ls',
+        'Latvian Lats',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'lyd',
+        'LD',
+        'د.ل.‏',
+        'Libyan Dinar',
+        3,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mad',
+        'MAD',
+        'د.م.‏',
+        'Moroccan Dirham',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mdl',
+        'MDL',
+        'MDL',
+        'Moldovan Leu',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mga',
+        'MGA',
+        'MGA',
+        'Malagasy Ariary',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mkd',
+        'MKD',
+        'MKD',
+        'Macedonian Denar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mmk',
+        'MMK',
+        'K',
+        'Myanma Kyat',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mnt',
+        'MNT',
+        '₮',
+        'Mongolian Tugrig',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mop',
+        'MOP$',
+        'MOP$',
+        'Macanese Pataca',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mur',
+        'MURs',
+        'MURs',
+        'Mauritian Rupee',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mwk',
+        'K',
+        'K',
+        'Malawian Kwacha',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'mxn',
+        'MX$',
+        '$',
+        'Mexican Peso',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.954Z',
+        '2025-10-27T03:14:16.954Z'
+    ),
+    (
+        'myr',
+        'RM',
+        'RM',
+        'Malaysian Ringgit',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'mzn',
+        'MTn',
+        'MTn',
+        'Mozambican Metical',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'nad',
+        'N$',
+        'N$',
+        'Namibian Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'ngn',
+        '₦',
+        '₦',
+        'Nigerian Naira',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'nio',
+        'C$',
+        'C$',
+        'Nicaraguan Córdoba',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'nok',
+        'Nkr',
+        'kr',
+        'Norwegian Krone',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'npr',
+        'NPRs',
+        'नेरू',
+        'Nepalese Rupee',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'nzd',
+        'NZ$',
+        '$',
+        'New Zealand Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'omr',
+        'OMR',
+        'ر.ع.‏',
+        'Omani Rial',
+        3,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'pab',
+        'B/.',
+        'B/.',
+        'Panamanian Balboa',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'pen',
+        'S/.',
+        'S/.',
+        'Peruvian Nuevo Sol',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'php',
+        '₱',
+        '₱',
+        'Philippine Peso',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'pkr',
+        'PKRs',
+        '₨',
+        'Pakistani Rupee',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'pln',
+        'zł',
+        'zł',
+        'Polish Zloty',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'pyg',
+        '₲',
+        '₲',
+        'Paraguayan Guarani',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'qar',
+        'QR',
+        'ر.ق.‏',
+        'Qatari Rial',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'ron',
+        'RON',
+        'RON',
+        'Romanian Leu',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'rsd',
+        'din.',
+        'дин.',
+        'Serbian Dinar',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'rub',
+        'RUB',
+        '₽.',
+        'Russian Ruble',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'rwf',
+        'RWF',
+        'FR',
+        'Rwandan Franc',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'sar',
+        'SR',
+        'ر.س.‏',
+        'Saudi Riyal',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'sdg',
+        'SDG',
+        'SDG',
+        'Sudanese Pound',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'sek',
+        'Skr',
+        'kr',
+        'Swedish Krona',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'sgd',
+        'S$',
+        '$',
+        'Singapore Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    )
+
+insert into
+    public.currency (
+        "code",
+        "symbol",
+        "symbol_native",
+        "name",
+        "decimal_digits",
+        "rounding",
+        "raw_rounding",
+        "created_at",
+        "updated_at"
+    )
+values (
+        'sos',
+        'Ssh',
+        'Ssh',
+        'Somali Shilling',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'syp',
+        'SY£',
+        'ل.س.‏',
+        'Syrian Pound',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'thb',
+        '฿',
+        '฿',
+        'Thai Baht',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'tnd',
+        'DT',
+        'د.ت.‏',
+        'Tunisian Dinar',
+        3,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'top',
+        'T$',
+        'T$',
+        'Tongan Paʻanga',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'tjs',
+        'TJS',
+        'с.',
+        'Tajikistani Somoni',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'try',
+        '₺',
+        '₺',
+        'Turkish Lira',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'ttd',
+        'TT$',
+        '$',
+        'Trinidad and Tobago Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'twd',
+        'NT$',
+        'NT$',
+        'New Taiwan Dollar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'tzs',
+        'TSh',
+        'TSh',
+        'Tanzanian Shilling',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'uah',
+        '₴',
+        '₴',
+        'Ukrainian Hryvnia',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'ugx',
+        'USh',
+        'USh',
+        'Ugandan Shilling',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'uyu',
+        '$U',
+        '$',
+        'Uruguayan Peso',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'uzs',
+        'UZS',
+        'UZS',
+        'Uzbekistan Som',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'vef',
+        'Bs.F.',
+        'Bs.F.',
+        'Venezuelan Bolívar',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'vnd',
+        '₫',
+        '₫',
+        'Vietnamese Dong',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'xaf',
+        'FCFA',
+        'FCFA',
+        'CFA Franc BEAC',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.955Z',
+        '2025-10-27T03:14:16.955Z'
+    ),
+    (
+        'xof',
+        'CFA',
+        'CFA',
+        'CFA Franc BCEAO',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.956Z',
+        '2025-10-27T03:14:16.956Z'
+    ),
+    (
+        'xpf',
+        '₣',
+        '₣',
+        'CFP Franc',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.956Z',
+        '2025-10-27T03:14:16.956Z'
+    ),
+    (
+        'yer',
+        'YR',
+        'ر.ي.‏',
+        'Yemeni Rial',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.956Z',
+        '2025-10-27T03:14:16.956Z'
+    ),
+    (
+        'zar',
+        'R',
+        'R',
+        'South African Rand',
+        2,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.956Z',
+        '2025-10-27T03:14:16.956Z'
+    ),
+    (
+        'zmk',
+        'ZK',
+        'ZK',
+        'Zambian Kwacha',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.956Z',
+        '2025-10-27T03:14:16.956Z'
+    ),
+    (
+        'zwl',
+        'ZWL$',
+        'ZWL$',
+        'Zimbabwean Dollar',
+        0,
+        0,
+        '{"value":"0","precision":20}',
+        '2025-10-27T03:14:16.956Z',
+        '2025-10-27T03:14:16.956Z'
     )

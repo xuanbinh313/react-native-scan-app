@@ -1,4 +1,5 @@
 import FormInput from '@/components/FormInput';
+import ImagePickerComponent from '@/components/ImagePicker';
 import { useAuth } from '@/ctx/AuthContext';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
@@ -29,6 +30,7 @@ const [isEditing, setIsEditing] = React.useState(false);
 
   return (
     <View className='flex flex-1 gap-3'>
+      <ImagePickerComponent />
       <FormInput control={control} name="email" editable={isEditing} />
       <FormInput control={control} name="phone" editable={isEditing} />
     </View>
