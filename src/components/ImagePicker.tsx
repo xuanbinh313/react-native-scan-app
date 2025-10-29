@@ -3,7 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import type { ImagePickerResult } from 'expo-image-picker';
 import { useEffect, useState } from 'react';
 import { Button, Image, Platform, StyleSheet, Text, View } from 'react-native';
-import { Image as CompressorImage } from 'react-native-compressor';
+// import { Image as CompressorImage } from 'react-native-compressor';
 import { supabaseClient } from '@/lib/supabase';
 
 export default function App() {
@@ -57,16 +57,16 @@ export default function App() {
         }
 
         // Resize / compress the image using react-native-compressor
-        const compressedUri = await CompressorImage.compress(uri, {
-          maxWidth: 1024,
-          maxHeight: 1024,
-          quality: 0.8,
-        });
+        // const compressedUri = await CompressorImage.compress(uri, {
+        //   maxWidth: 1024,
+        //   maxHeight: 1024,
+        //   quality: 0.8,
+        // });
 
-        const img = await fetchImageFromUri(compressedUri);
-        const filename = `${Date.now()}.jpg`;
-        const uploadUrl = await uploadImage(filename, img);
-        downloadImage(uploadUrl);
+        // const img = await fetchImageFromUri(compressedUri);
+        // const filename = `${Date.now()}.jpg`;
+        // const uploadUrl = await uploadImage(filename, img);
+        // downloadImage(uploadUrl);
       }
     } catch (e) {
       console.log(e);
@@ -139,10 +139,8 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
   title: {
     fontSize: 20,

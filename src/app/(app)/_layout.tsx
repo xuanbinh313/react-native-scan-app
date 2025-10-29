@@ -7,7 +7,6 @@ export default function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('Auth loading finished, session:', loading, session);
     if (!loading && !session) {
       router.replace('/login'); // chưa đăng nhập → về Login
     }

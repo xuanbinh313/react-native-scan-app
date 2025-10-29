@@ -2,7 +2,7 @@
   "expo": {
     "name": "keep-your-choice",
     "scheme": "keep-your-choice",
-    "slug": "keep-your-choice",
+    "slug": "scanner-app",
     "version": "1.0.0",
     "web": {
       "favicon": "./src/assets/favicon.png",
@@ -39,7 +39,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7b0c0412-735e-4fa1-a02f-b4f6f20516a3"
       }
-    }
+    },
+    "owner": "tranbinh"
   }
 }

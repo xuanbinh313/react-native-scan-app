@@ -24,7 +24,7 @@ export function FormInput<
       render={({ field: { onChange, onBlur, value }, fieldState }) => (
         <>
           <TextInput
-            className="rounded-lg bg-slate-300 p-4"
+            className="bg-blue-dark text-black-600 rounded-full p-5"
             onBlur={onBlur}
             onChangeText={onChange}
             value={value}
