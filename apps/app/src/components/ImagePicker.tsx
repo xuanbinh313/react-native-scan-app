@@ -8,7 +8,9 @@ import { supabaseClient } from '@/lib/supabase';
 
 export default function App() {
   const [image, setImage] = useState<string | null>(null);
+  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [percentage, setPercentage] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -45,10 +47,8 @@ export default function App() {
     try {
       const cancelled = (pickerResult as any).cancelled ?? (pickerResult as any).canceled;
       if (cancelled) {
-        alert('Upload cancelled');
         return;
       } else {
-        setPercentage(0);
         // Expo ImagePicker can return different shapes depending on SDK version.
         const uri = (pickerResult as any).uri ?? (pickerResult as any).assets?.[0]?.uri;
         if (!uri) {
@@ -56,32 +56,79 @@ export default function App() {
           return;
         }
 
-        // Resize / compress the image using react-native-compressor
-        // const compressedUri = await CompressorImage.compress(uri, {
-        //   maxWidth: 1024,
-        //   maxHeight: 1024,
-        //   quality: 0.8,
-        // });
-
-        // const img = await fetchImageFromUri(compressedUri);
-        // const filename = `${Date.now()}.jpg`;
-        // const uploadUrl = await uploadImage(filename, img);
-        // downloadImage(uploadUrl);
+        // Just set the preview image, don't upload yet
+        setSelectedImageUri(uri);
       }
     } catch (e) {
       console.log(e);
-      alert('Upload failed');
+      alert('Failed to select image');
     }
   };
 
-  const uploadImage = async (filename: string, img: Blob) => {
-    // Upload blob to Supabase Storage
+  const handleUpload = async () => {
+    if (!selectedImageUri) {
+      alert('Please select an image first');
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setPercentage(0);
+
+      const filename = `${Date.now()}.jpg`;
+      const uploadUrl = await uploadImage(filename, selectedImageUri);
+      downloadImage(uploadUrl);
+      
+      // Clear the selected image after successful upload
+      setSelectedImageUri(null);
+      alert('Upload successful!');
+    } catch (e) {
+      console.log(e);
+      alert('Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const uploadImage = async (filename: string, fileUri: string) => {
+    // Upload image to Supabase Storage
     const bucket = 'images';
     try {
-      const { data, error } = await supabaseClient.storage.from(bucket).upload(filename, img, {
-        cacheControl: '3600',
-        upsert: true,
+      // For React Native, use fetch to get the file and FileReader to convert to base64
+      const response = await fetch(fileUri);
+      const blob = await response.blob();
+      
+      // Convert blob to base64 using FileReader
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          // Remove data:image/...;base64, prefix if present
+          const base64 = base64String.includes(',') 
+            ? base64String.split(',')[1] 
+            : base64String;
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
       });
+
+      // Decode base64 to binary ArrayBuffer
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+
+      // Upload the ArrayBuffer directly (Supabase supports this)
+      const { data, error } = await supabaseClient.storage
+        .from(bucket)
+        .upload(filename, bytes.buffer, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: 'image/jpeg',
+        });
+        
       if (error) throw error;
       const { data: publicData } = supabaseClient.storage.from(bucket).getPublicUrl(filename);
       return publicData.publicUrl;
@@ -105,13 +152,6 @@ export default function App() {
     setImage(uri);
   };
 
-  const fetchImageFromUri = async (uri: string) => {
-    // fetch a blob from the local file uri (file:// or content://)
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    return blob;
-  };
-
   const copyToClipboard = () => {
     image && Clipboard.setStringAsync(image);
     alert('Copied image URL to clipboard');
@@ -119,11 +159,26 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>AWS Storage Upload Demo</Text>
+      <Text style={styles.title}>Image Upload Demo</Text>
       {percentage !== 0 && <Text style={styles.percentage}>{percentage}%</Text>}
 
+      {/* Preview selected image */}
+      {selectedImageUri && (
+        <View style={styles.previewContainer}>
+          <Text style={styles.previewLabel}>Preview:</Text>
+          <Image source={{ uri: selectedImageUri }} style={styles.previewImage} />
+          <Button 
+            onPress={handleUpload} 
+            title={uploading ? "Uploading..." : "Upload to Supabase"} 
+            disabled={uploading}
+          />
+        </View>
+      )}
+
+      {/* Show uploaded image */}
       {image && (
-        <View>
+        <View style={styles.uploadedContainer}>
+          <Text style={styles.uploadedLabel}>Uploaded Image:</Text>
           <Text style={styles.result} onPress={copyToClipboard}>
             <Image source={{ uri: image }} style={{ width: 250, height: 250 }} />
           </Text>
@@ -131,8 +186,10 @@ export default function App() {
         </View>
       )}
 
-      <Button onPress={pickImage} title="Pick an image from camera roll" />
-      <Button onPress={takePhoto} title="Take a photo" />
+      <View style={styles.buttonContainer}>
+        <Button onPress={pickImage} title="Pick an image from camera roll" />
+        <Button onPress={takePhoto} title="Take a photo" />
+      </View>
     </View>
   );
 }
@@ -151,11 +208,39 @@ const styles = StyleSheet.create({
   percentage: {
     marginBottom: 10,
   },
+  previewContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  previewLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  previewImage: {
+    width: 300,
+    height: 300,
+    marginBottom: 15,
+    borderRadius: 8,
+  },
+  uploadedContainer: {
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  uploadedLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
   result: {
     paddingTop: 5,
   },
   info: {
     textAlign: 'center',
     marginBottom: 20,
+  },
+  buttonContainer: {
+    gap: 10,
+    marginTop: 20,
   },
 });

@@ -19,7 +19,8 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ],
-      "react-native-compressor"
+      "react-native-compressor",
+      "expo-font"
     ],
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
@@ -33,7 +34,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tranbinh.scannerapp"
     },
     "android": {
       "adaptiveIcon": {
@@ -42,7 +44,8 @@
       },
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "package": "com.tranbinh.scannerapp"
     },
     "extra": {
       "router": {},
