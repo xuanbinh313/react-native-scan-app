@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs, useRouter } from 'expo-router';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { Tabs, useRouter } from 'expo-router';
 import { Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 function CustomTabBar({ state }: BottomTabBarProps) {
   const router = useRouter();
@@ -12,7 +13,7 @@ function CustomTabBar({ state }: BottomTabBarProps) {
     { name: 'profile', icon: 'person-outline', label: 'Profile' },
   ];
   return (
-    <View className="absolute bottom-0 left-0 right-0 h-16 flex-row items-center justify-around rounded-3xl bg-zinc-900 shadow-lg">
+    <View className="h-16 flex-row items-center justify-around rounded-3xl bg-zinc-900 shadow-lg">
       {tabs.map((tab, index) => {
         const isFocused = state.index === index;
         return (
@@ -33,21 +34,24 @@ function CustomTabBar({ state }: BottomTabBarProps) {
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarStyle: {
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          backgroundColor: '#222',
-          height: 80,
-          elevation: 5,
-        },
-      }}
-      tabBar={(props) => <CustomTabBar {...props} />}>
-    </Tabs>
+    <SafeAreaView className='flex-1'>
+      <Tabs
+        screenOptions={{
+          tabBarStyle: {
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            backgroundColor: '#222',
+            height: 80,
+            elevation: 5,
+          },
+        }}
+        tabBar={(props) => <CustomTabBar {...props} />}>
+      </Tabs>
+    </SafeAreaView>
+
   );
 }

@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCompare } from '@/ctx/CompareContext';
 import { CompareBottomSheet } from '@/components/CompareBottomSheet';
-import BottomSheet from '@gorhom/bottom-sheet';
+import BottomSheet, { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function useProducts() {
@@ -36,53 +36,53 @@ export default function ProductsScreen() {
   if (isLoading) return <Text>Loading...</Text>;
 
   return (
-    <GestureHandlerRootView>
-      <View className="mb-20 flex flex-1">
-        <ScrollView horizontal className="flex-none p-6" contentContainerClassName="gap-1">
-          {categories?.map((category) => (
-            <View
-              key={category.id}
-              className="h-9 w-fit items-center justify-center rounded-full border border-black-300 px-2">
-              <Text>{category.name}</Text>
-            </View>
-          ))}
-        </ScrollView>
-        <FlatList
-          className="bg-black-100 px-4"
-          data={products}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          renderItem={({ item }) => {
-            const selected = isSelected(item.id);
-            return (
-              <TouchableOpacity onPress={() => toggleProduct(item)} className="m-2 flex-1">
-                <View
-                  className={`relative h-48 items-center rounded-xl bg-black-500 ${selected ? 'border-primary border-2' : ''}`}>
-                  {selected && (
-                    <View className="bg-primary absolute right-2 top-2 z-10 h-6 w-6 items-center justify-center rounded-full">
-                      <Text className="text-xs color-white">✓</Text>
+      <GestureHandlerRootView className='flex-1'>
+        <BottomSheetModalProvider>
+          <ScrollView horizontal className="flex-none p-6" contentContainerClassName="gap-1">
+            {categories?.map((category) => (
+              <View
+                key={category.id}
+                className="h-9 w-fit items-center justify-center rounded-full border border-black-300 px-2">
+                <Text>{category.name}</Text>
+              </View>
+            ))}
+          </ScrollView>
+          <FlatList
+            className="bg-black-100 px-4"
+            data={products}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            renderItem={({ item }) => {
+              const selected = isSelected(item.id);
+              return (
+                <TouchableOpacity onPress={() => toggleProduct(item)} className="m-2 flex-1">
+                  <View
+                    className={`relative h-48 items-center rounded-xl bg-black-500 ${selected ? 'border-primary border-2' : ''}`}>
+                    {selected && (
+                      <View className="bg-primary absolute right-2 top-2 z-10 h-6 w-6 items-center justify-center rounded-full">
+                        <Text className="text-xs color-white">✓</Text>
+                      </View>
+                    )}
+                    {item.thumbnail && (
+                      <Image
+                        source={{ uri: item.thumbnail }}
+                        className="w-full flex-1"
+                        resizeMode="contain"
+                      />
+                    )}
+                    <View className="w-full p-4">
+                      <Text className="font-primary-semibold text-sm color-black-main">$89</Text>
+                      <Text className="pt-1 font-primary-regular text-xs color-black-200">
+                        {item.title}
+                      </Text>
                     </View>
-                  )}
-                  {item.thumbnail && (
-                    <Image
-                      source={{ uri: item.thumbnail }}
-                      className="w-full flex-1"
-                      resizeMode="contain"
-                    />
-                  )}
-                  <View className="w-full p-4">
-                    <Text className="font-primary-semibold text-sm color-black-main">$89</Text>
-                    <Text className="pt-1 font-primary-regular text-xs color-black-200">
-                      {item.title}
-                    </Text>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-        />
-        <CompareBottomSheet />
-      </View>
-    </GestureHandlerRootView>
+                </TouchableOpacity>
+              );
+            }}
+          />
+          <CompareBottomSheet />
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
   );
 }
