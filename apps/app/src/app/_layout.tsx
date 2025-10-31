@@ -1,4 +1,5 @@
 import { AuthProvider, useAuth } from '@/ctx/AuthContext';
+import { CompareProvider } from '@/ctx/CompareContext';
 import {
   Manrope_400Regular,
   Manrope_500Medium,
@@ -58,9 +59,11 @@ export default function AppLayout() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
-        <SafeAreaProvider>
-        <RootContent />
-        </SafeAreaProvider>
+        <CompareProvider>
+          <SafeAreaProvider>
+            <RootContent />
+          </SafeAreaProvider>
+        </CompareProvider>
       </QueryClientProvider>
     </AuthProvider>
   );

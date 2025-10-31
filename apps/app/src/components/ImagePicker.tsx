@@ -3,15 +3,14 @@ import * as ImagePicker from 'expo-image-picker';
 import type { ImagePickerResult } from 'expo-image-picker';
 import { useEffect, useState } from 'react';
 import { Button, Image, Platform, StyleSheet, Text, View } from 'react-native';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 // import { Image as CompressorImage } from 'react-native-compressor';
 import { supabaseClient } from '@/lib/supabase';
-
 export default function App() {
   const [image, setImage] = useState<string | null>(null);
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [percentage, setPercentage] = useState(0);
   const [uploading, setUploading] = useState(false);
-
   useEffect(() => {
     (async () => {
       if (Platform.OS !== 'web') {
@@ -42,7 +41,16 @@ export default function App() {
 
     handleImagePicked(result);
   };
-
+  const compressImage = async (uri: string) => {
+    const context = ImageManipulator.manipulate(uri);
+    context.resize({ width: 800 }); // Resize to width of 800px, maintaining aspect ratio
+    const image = await context.renderAsync();
+    const result = await image.saveAsync({
+      format: SaveFormat.PNG,
+    });
+    console.log(result);
+    return result.uri;
+  };
   const handleImagePicked = async (pickerResult: ImagePickerResult) => {
     try {
       const cancelled = (pickerResult as any).cancelled ?? (pickerResult as any).canceled;
@@ -55,7 +63,8 @@ export default function App() {
           alert('Could not get image uri');
           return;
         }
-
+        const compressedUri = await compressImage(uri);
+        console.log('Compressed URI:', compressedUri);
         // Just set the preview image, don't upload yet
         setSelectedImageUri(uri);
       }
@@ -78,7 +87,7 @@ export default function App() {
       const filename = `${Date.now()}.jpg`;
       const uploadUrl = await uploadImage(filename, selectedImageUri);
       downloadImage(uploadUrl);
-      
+
       // Clear the selected image after successful upload
       setSelectedImageUri(null);
       alert('Upload successful!');
@@ -97,16 +106,14 @@ export default function App() {
       // For React Native, use fetch to get the file and FileReader to convert to base64
       const response = await fetch(fileUri);
       const blob = await response.blob();
-      
+
       // Convert blob to base64 using FileReader
       const base64Data = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
           const base64String = reader.result as string;
           // Remove data:image/...;base64, prefix if present
-          const base64 = base64String.includes(',') 
-            ? base64String.split(',')[1] 
-            : base64String;
+          const base64 = base64String.includes(',') ? base64String.split(',')[1] : base64String;
           resolve(base64);
         };
         reader.onerror = reject;
@@ -128,7 +135,7 @@ export default function App() {
           upsert: true,
           contentType: 'image/jpeg',
         });
-        
+
       if (error) throw error;
       const { data: publicData } = supabaseClient.storage.from(bucket).getPublicUrl(filename);
       return publicData.publicUrl;
@@ -167,9 +174,9 @@ export default function App() {
         <View style={styles.previewContainer}>
           <Text style={styles.previewLabel}>Preview:</Text>
           <Image source={{ uri: selectedImageUri }} style={styles.previewImage} />
-          <Button 
-            onPress={handleUpload} 
-            title={uploading ? "Uploading..." : "Upload to Supabase"} 
+          <Button
+            onPress={handleUpload}
+            title={uploading ? 'Uploading...' : 'Upload to Supabase'}
             disabled={uploading}
           />
         </View>
